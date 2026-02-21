@@ -9,23 +9,43 @@ into Sage, Pastel, Xero, QuickBooks, or any accounting software.
 
 ## Table of Contents
 
-1. [One-Time Setup](#one-time-setup)
-2. [How to Convert Bank Statements](#how-to-convert-bank-statements)
-3. [What the Output Looks Like](#what-the-output-looks-like)
-4. [Output Formats](#output-formats)
-5. [Advanced Usage](#advanced-usage)
-6. [Supported Banks](#supported-banks)
-7. [Importing into Accounting Software](#importing-into-accounting-software)
-8. [Password-Protected PDFs](#password-protected-pdfs)
-9. [Troubleshooting](#troubleshooting)
-10. [Quick Reference Card](#quick-reference-card)
+1. [Standalone Download (easiest)](#standalone-download-easiest)
+2. [One-Time Setup (source version)](#one-time-setup-source-version)
+3. [How to Convert Bank Statements](#how-to-convert-bank-statements)
+4. [What the Output Looks Like](#what-the-output-looks-like)
+5. [Output Formats](#output-formats)
+6. [Advanced Usage](#advanced-usage)
+7. [Supported Banks](#supported-banks)
+8. [Importing into Accounting Software](#importing-into-accounting-software)
+9. [Password-Protected PDFs](#password-protected-pdfs)
+10. [Troubleshooting](#troubleshooting)
+11. [Quick Reference Card](#quick-reference-card)
 
 ---
 
-## One-Time Setup
+## Standalone Download (easiest)
 
-> **Standalone exe available:** If you received a `BankStatementConverter.exe`
-> file, skip this entire section — just double-click the exe. No setup needed.
+**No Python or setup needed.** Download the ready-to-run app for your platform:
+
+**Download page:** https://github.com/Ocram31/BankStatementConverter/releases/latest
+
+| Platform | Download | How to open |
+|----------|----------|-------------|
+| **Windows** | `BankStatementConverter-Windows.zip` | Unzip, double-click **`BankStatementConverter.exe`** |
+| **Mac** | `BankStatementConverter-Mac.dmg` | Open DMG, drag app to Applications, right-click → **Open** first time |
+| **Linux** | `BankStatementConverter-Linux.zip` | Unzip, run `./BankStatementConverter` in Terminal |
+
+> **Mac users:** macOS will warn you the first time — see [Troubleshooting: Mac Gatekeeper](#mac-cannot-be-opened-because-it-is-from-an-unidentified-developer--cannot-verify-it-is-free-of-malware).
+
+> **Windows users:** SmartScreen may warn you — click **"More info"** → **"Run anyway"**. See [Troubleshooting: Windows SmartScreen](#windows-windows-protected-your-pc-smartscreen).
+
+If you downloaded the standalone app, **skip to [How to Convert Bank Statements](#how-to-convert-bank-statements)**.
+
+---
+
+## One-Time Setup (source version)
+
+> **Already downloaded the standalone app above?** Skip this entire section.
 
 > **Auto-setup:** If you have Python installed, you can skip Step 2 entirely.
 > Just double-click `converter.bat` or `run.bat` — it will set up automatically

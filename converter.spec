@@ -137,7 +137,7 @@ if is_mac:
         bundle_identifier='za.co.bankconverter',
         info_plist={
             'CFBundleDisplayName': 'BankStatementConverter',
-            'CFBundleShortVersionString': '2.0.0',
+            'CFBundleShortVersionString': '2.0.4',
             'NSHighResolutionCapable': True,
         },
     )
