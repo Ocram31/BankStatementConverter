@@ -1,6 +1,6 @@
 # Bank Statement PDF to CSV Converter
 
-**Version 2.0.4**
+**Version 2.0.5**
 
 Converts South African bank statement PDFs into CSV files for import into
 Sage, Pastel, Xero, QuickBooks, or any accounting software.
