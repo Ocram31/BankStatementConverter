@@ -807,9 +807,16 @@ class ConverterGUI:
 
 
 def main():
-    # Use TkinterDnD root if available (enables drag-and-drop)
+    global HAS_DND
+    # Use TkinterDnD root if available (enables drag-and-drop).
+    # Falls back to plain Tk if the tkdnd native extension fails to load
+    # (e.g. when tkinterdnd2 is compiled for Tcl 8.x but the runtime uses Tcl 9.x).
     if HAS_DND:
-        root = tkinterdnd2.TkinterDnD.Tk()
+        try:
+            root = tkinterdnd2.TkinterDnD.Tk()
+        except (RuntimeError, Exception):
+            HAS_DND = False
+            root = tk.Tk()
     else:
         root = tk.Tk()
 

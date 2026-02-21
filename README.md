@@ -12,8 +12,22 @@ Sage, Pastel, Xero, QuickBooks, or any accounting software.
 That's it. On first run it automatically installs everything, then opens the GUI.
 Drop your PDFs in, click Convert, done.
 
-> **No Python?** Download a standalone `.exe` from the Releases page — no
+> **No Python?** Download a standalone binary from the Releases page — no
 > installation needed at all.
+
+## macOS Installation (Standalone App)
+
+1. Download `BankStatementConverter-Mac.dmg` from the [Releases page](../../releases).
+2. Double-click the DMG to mount it, then drag **BankStatementConverter** to your
+   **Applications** folder.
+3. **First launch:** right-click the app → **Open** → click **Open** in the dialog.
+   (This is required once because the app is unsigned — Gatekeeper will warn you,
+   but the app is safe to run.)
+
+> On subsequent launches you can open it normally from Launchpad or Spotlight.
+
+Alternatively, download `BankStatementConverter-Mac.zip`, unzip it, drag the `.app`
+to Applications, and right-click → Open on first launch.
 
 ### Alternative: Command line
 

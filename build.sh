@@ -87,3 +87,17 @@ echo "  Distribution package in: dist/BankStatementConverter-dist/"
 echo "    Zip this folder to share with users."
 echo "    No Python installation required."
 echo "============================================================"
+
+# --- macOS: fix permissions, create .zip and .dmg for distribution ---
+if [[ "$OSTYPE" == "darwin"* ]] && [ -d "dist/BankStatementConverter.app" ]; then
+    echo
+    echo "Creating macOS distribution packages..."
+    chmod +x dist/BankStatementConverter.app/Contents/MacOS/BankStatementConverter
+    (cd dist && zip -r --symlinks ../BankStatementConverter-Mac.zip BankStatementConverter.app)
+    hdiutil create -volname "BankStatementConverter" \
+        -srcfolder dist/BankStatementConverter.app \
+        -ov -format UDZO \
+        BankStatementConverter-Mac.dmg
+    echo "  BankStatementConverter-Mac.zip  — share this (preserves permissions)"
+    echo "  BankStatementConverter-Mac.dmg  — drag-to-Applications installer"
+fi

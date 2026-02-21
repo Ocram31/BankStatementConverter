@@ -13,7 +13,7 @@ jobs:
         include:
           - os: windows-latest
             artifact: BankStatementConverter-Windows
-          - os: macos-latest
+          - os: macos-13          # Intel x86_64 — runs on Intel + Apple Silicon via Rosetta
             artifact: BankStatementConverter-Mac
           - os: ubuntu-latest
             artifact: BankStatementConverter-Linux
@@ -37,13 +37,29 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller converter.spec --noconfirm
 
-      - name: Upload artifact (Mac .app bundle)
+      # ── macOS: fix permissions, zip with symlinks, create DMG ──────────────
+      - name: Package macOS .app
+        if: runner.os == 'macOS'
+        run: |
+          chmod +x dist/BankStatementConverter.app/Contents/MacOS/BankStatementConverter
+          cd dist
+          zip -r --symlinks ../BankStatementConverter-Mac.zip BankStatementConverter.app
+          cd ..
+          hdiutil create -volname "BankStatementConverter" \
+            -srcfolder dist/BankStatementConverter.app \
+            -ov -format UDZO \
+            BankStatementConverter-Mac.dmg
+
+      - name: Upload macOS artifacts
         if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: dist/BankStatementConverter.app/
+          path: |
+            BankStatementConverter-Mac.zip
+            BankStatementConverter-Mac.dmg
 
+      # ── Windows / Linux: standard single-folder artifact ───────────────────
       - name: Upload artifact (Windows / Linux)
         if: runner.os != 'macOS'
         uses: actions/upload-artifact@v4
@@ -65,16 +81,27 @@ jobs:
         with:
           path: artifacts/
 
-      - name: Zip artifacts
+      - name: Zip Windows and Linux artifacts
         run: |
           cd artifacts
-          for dir in */; do
-            name="${dir%/}"
-            (cd "$dir" && zip -r "../${name}.zip" .)
+          for dir in BankStatementConverter-Windows BankStatementConverter-Linux; do
+            if [ -d "$dir" ]; then
+              (cd "$dir" && zip -r "../${dir}.zip" .)
+            fi
           done
+
+      - name: Collect release files
+        run: |
+          mkdir -p release_files
+          # macOS artifacts are already pre-zipped with correct permissions
+          cp artifacts/BankStatementConverter-Mac/BankStatementConverter-Mac.zip release_files/ 2>/dev/null || true
+          cp artifacts/BankStatementConverter-Mac/BankStatementConverter-Mac.dmg release_files/ 2>/dev/null || true
+          # Windows & Linux zips created above
+          cp artifacts/BankStatementConverter-Windows.zip release_files/ 2>/dev/null || true
+          cp artifacts/BankStatementConverter-Linux.zip   release_files/ 2>/dev/null || true
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/*.zip
+          files: release_files/*
           generate_release_notes: true
