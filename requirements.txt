@@ -1,0 +1,14 @@
+pdfplumber>=0.11.0
+ttkthemes>=3.0
+tkinterdnd2>=0.4.0
+
+# Optional: password-protected PDF support (SA banks encrypt statements)
+# pip install pikepdf
+pikepdf>=9.0.0
+
+# Optional: Excel output with formatting
+openpyxl>=3.1.0
+
+# Optional: OCR for FNB fee descriptions rendered as images
+# pip install pytesseract Pillow
+# Also requires: sudo apt install tesseract-ocr tesseract-ocr-afr

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+
+# Output files (keep the folders via .gitkeep)
+csv/*.csv
+csv/*.xlsx
+pdfs/*.pdf
+settings.json
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# PyInstaller
+build/
+dist/
+
+# Temporary
+*.tmp
+*.decrypted.pdf
+
+# Archives
+*.zip
+*.tar.gz
+
+# Development only
+.claude/
