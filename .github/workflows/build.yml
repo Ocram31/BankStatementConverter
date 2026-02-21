@@ -37,7 +37,15 @@ jobs:
       - name: Build with PyInstaller
         run: pyinstaller converter.spec --noconfirm
 
-      - name: Upload artifact
+      - name: Upload artifact (Mac .app bundle)
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/BankStatementConverter.app/
+
+      - name: Upload artifact (Windows / Linux)
+        if: runner.os != 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}

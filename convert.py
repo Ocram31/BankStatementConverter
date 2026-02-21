@@ -885,19 +885,82 @@ def _clean_ocr_text(text):
         return ''
     # Strip common OCR noise characters
     text = re.sub(r'[#|{}\[\]]+', '', text)
-    # Strip leading/trailing punctuation (except parentheses which may be intentional)
-    text = text.strip().strip('#|{}[]').strip()
+    # Strip leading/trailing punctuation and garbage chars
+    text = re.sub(r'^[)\(\]\[.,;:!?\d\s]+', '', text)
+    text = re.sub(r'[\d)\(\]\[.,;:!?\s]+$', '', text)
+    text = text.strip()
     # Fix common OCR misreads in Afrikaans bank terms
     ocr_fixes = {
+        'Diens Fooi': 'Diensfooie',
+        'Dienstooi': 'Diensfooie',
+        'Diensfool': 'Diensfooie',
+        'Dienstool': 'Diensfooie',
         'luitingsaldo': 'Sluitingsaldo',
         'peningsaldo': 'Openingsaldo',
         'iensfooie': 'Diensfooie',
         'ankkoste': 'Bankkoste',
+        'TW is ingesluit': 'BTW is ingesluit',
+        'Maandelikse': 'Maandelike',
     }
     for wrong, right in ocr_fixes.items():
         if wrong in text:
             text = text.replace(wrong, right)
     return text
+
+
+# Known FNB fee descriptions (Afrikaans) for fuzzy matching
+_FNB_KNOWN_FEES = [
+    'Maandelike Diensfooie',
+    'BTW is ingesluit teen 15.00%',
+    'Diensfooie',
+    'Bankkoste',
+    'Rekeningfooie',
+    'Transaksiefooi',
+    'Elektroniese Bankfooie',
+    'Kontanthandeling',
+    'Minimumfooi',
+]
+
+
+def _match_known_fee(ocr_text):
+    """Match OCR text against known FNB fee descriptions.
+
+    Returns the known description if a reasonable match is found, else None.
+    """
+    if not ocr_text or len(ocr_text) < 3:
+        return None
+    lower = ocr_text.lower()
+    for known in _FNB_KNOWN_FEES:
+        known_lower = known.lower()
+        # Check if OCR text is a substring match or close match
+        if known_lower in lower or lower in known_lower:
+            return known
+        # Check shared word overlap (at least half the words match)
+        known_words = set(known_lower.split())
+        ocr_words = set(lower.split())
+        overlap = known_words & ocr_words
+        if len(overlap) >= max(1, len(known_words) // 2):
+            return known
+    return None
+
+
+def _is_garbage_ocr(text):
+    """Detect garbage OCR output that should be rejected."""
+    if not text:
+        return True
+    # Reject if it contains amount-like patterns (digits with Kt/Dt suffixes)
+    if re.search(r'\d{3,}', text):
+        return True
+    if re.search(r'\b(Kt|Dt|kt|dt)\b', text):
+        return True
+    # Reject if too short after cleanup
+    if len(text) < 3:
+        return True
+    # Reject if mostly digits/punctuation
+    alpha_count = sum(1 for c in text if c.isalpha())
+    if alpha_count < len(text) * 0.4:
+        return True
+    return False
 
 
 def _ocr_fnb_fee_descriptions(pdf_path, transactions):
@@ -965,7 +1028,11 @@ def _ocr_fnb_fee_descriptions(pdf_path, transactions):
                             ).strip()
 
                             ocr_text = _clean_ocr_text(ocr_text)
-                            if ocr_text and len(ocr_text) > 2:
+                            # Try matching against known fee descriptions
+                            known = _match_known_fee(ocr_text)
+                            if known:
+                                txn.description = known
+                            elif ocr_text and not _is_garbage_ocr(ocr_text):
                                 txn.description = clean_description(ocr_text)
                         except Exception:
                             if not ocr_warned:

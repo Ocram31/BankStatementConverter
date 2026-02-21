@@ -433,6 +433,40 @@ encrypted, the password is simply ignored.
 
 ## Troubleshooting
 
+### Mac: "Cannot be opened because it is from an unidentified developer" / "Cannot verify it is free of malware"
+
+macOS blocks apps that aren't signed with an Apple certificate. To open the converter:
+
+1. **Don't** double-click the app.
+2. **Right-click** (or Control+click) on `BankStatementConverter`.
+3. Click **"Open"** from the menu.
+4. A dialog appears — click **"Open"** again.
+5. macOS remembers your choice — it won't ask again.
+
+If that doesn't work (on newer macOS versions), open **Terminal** and run:
+
+```
+xattr -cr /path/to/BankStatementConverter
+```
+
+**Tip:** Type `xattr -cr ` (with a space at the end), then drag the BankStatementConverter
+folder from Finder onto the Terminal window — it fills in the path for you. Press Enter.
+
+This removes the quarantine flag that macOS adds to downloaded files. You only need to do
+this once.
+
+---
+
+### Windows: "Windows protected your PC" (SmartScreen)
+
+Windows may show a blue SmartScreen warning for downloaded apps. To open the converter:
+
+1. Click **"More info"** on the SmartScreen popup.
+2. Click **"Run anyway"**.
+3. Windows remembers your choice — it won't ask again.
+
+---
+
 ### "Setup complete!" didn't appear when running setup
 
 - **Windows:** Make sure Python is installed and "Add to PATH" was ticked.

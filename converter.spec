@@ -128,10 +128,16 @@ coll = COLLECT(
     name='BankStatementConverter',
 )
 
-# macOS: create a .app bundle
+# macOS: create a .app bundle (wraps COLLECT so all files are inside)
 if is_mac:
     app = BUNDLE(
-        exe,
+        coll,
         name='BankStatementConverter.app',
+        icon='icon.png',
         bundle_identifier='za.co.bankconverter',
+        info_plist={
+            'CFBundleDisplayName': 'BankStatementConverter',
+            'CFBundleShortVersionString': '2.0.0',
+            'NSHighResolutionCapable': True,
+        },
     )
