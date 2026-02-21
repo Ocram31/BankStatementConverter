@@ -10,5 +10,6 @@ pikepdf>=9.0.0
 openpyxl>=3.1.0
 
 # Optional: OCR for FNB fee descriptions rendered as images
-# pip install pytesseract Pillow
-# Also requires: sudo apt install tesseract-ocr tesseract-ocr-afr
+# Also requires system package: sudo apt install tesseract-ocr tesseract-ocr-afr
+pytesseract>=0.3.10
+Pillow>=10.0.0

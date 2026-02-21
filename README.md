@@ -98,7 +98,7 @@ Zip the folder and share — recipients need nothing installed.
 
 - Python 3.12+
 - pdfplumber (installed automatically)
-- Optional: pikepdf (password-protected PDFs), tkinterdnd2 (drag-and-drop), PyInstaller (building exe)
+- Optional: pikepdf (password-protected PDFs), openpyxl (Excel output), ttkthemes (GUI themes), tkinterdnd2 (drag-and-drop), pytesseract + Pillow (OCR), PyInstaller (building exe)
 
 ## Full Documentation
 
