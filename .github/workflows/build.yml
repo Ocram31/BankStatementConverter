@@ -13,7 +13,7 @@ jobs:
         include:
           - os: windows-latest
             artifact: BankStatementConverter-Windows
-          - os: macos-13          # Intel x86_64 — runs on Intel + Apple Silicon via Rosetta
+          - os: macos-latest          # Apple Silicon arm64 (works natively + via Rosetta on Intel)
             artifact: BankStatementConverter-Mac
           - os: ubuntu-latest
             artifact: BankStatementConverter-Linux
@@ -33,6 +33,51 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pyinstaller
+
+      # ── macOS: try to enable Tcl-9 compatible tkdnd (DnD nice-to-have) ─────
+      # If this step fails, the app still works — DnD falls back gracefully.
+      - name: Build tkdnd for Tcl 9.x (macOS, best-effort)
+        if: runner.os == 'macOS'
+        continue-on-error: true
+        run: |
+          brew install tcl-tk cmake
+          git clone https://github.com/petasis/tkdnd.git --depth 1 /tmp/tkdnd
+          TCL_ROOT=$(brew --prefix tcl-tk)
+          cmake /tmp/tkdnd -B /tmp/tkdnd-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DTCL_TCLSH="${TCL_ROOT}/bin/tclsh" \
+            -DTCL_LIBRARY="${TCL_ROOT}/lib/libtcl9.0.dylib" \
+            -DTCL_INCLUDE_PATH="${TCL_ROOT}/include/tcl-tk" \
+            -DTK_LIBRARY="${TCL_ROOT}/lib/libtcl9tk9.0.dylib" \
+            -DTK_INCLUDE_PATH="${TCL_ROOT}/include/tcl-tk"
+          cmake --build /tmp/tkdnd-build --config Release
+
+          # Inject the Tcl 9.x dylib into the installed tkinterdnd2 package
+          python - << 'PYEOF'
+          import os, platform, tkinterdnd2, shutil
+          arch = 'osx-arm64' if platform.machine() == 'arm64' else 'osx-x64'
+          d = os.path.join(os.path.dirname(tkinterdnd2.__file__), 'tkdnd', arch)
+          shutil.copy('/tmp/tkdnd-build/libtkdnd2.9.5.dylib', d)
+          for f in os.listdir('/tmp/tkdnd/library'):
+              if f.endswith('.tcl'):
+                  shutil.copy(os.path.join('/tmp/tkdnd/library', f), d)
+          idx = os.path.join(d, 'pkgIndex.tcl')
+          with open(idx, 'w') as fh:
+              fh.write(
+                  'namespace eval ::tkdnd {\n'
+                  '  proc source { filename { encoding utf-8 } } {\n'
+                  '    ::source -encoding $encoding $filename\n'
+                  '  }\n'
+                  '}\n'
+                  'package ifneeded tkdnd 2.9.5 \\\n'
+                  '  "tkdnd::source {$dir/tkdnd.tcl} ; \\\n'
+                  '   tkdnd::initialise {$dir} libtkdnd2.9.5.dylib tkdnd"\n'
+                  'package ifneeded tkdnd::utils 2.9.5 \\\n'
+                  '  "tkdnd::source {$dir/tkdnd_utils.tcl} ; \\\n'
+                  '   package provide tkdnd::utils 2.9.5"\n'
+              )
+          print(f"tkdnd 2.9.5 patched into {d}")
+          PYEOF
 
       - name: Build with PyInstaller
         run: pyinstaller converter.spec --noconfirm
